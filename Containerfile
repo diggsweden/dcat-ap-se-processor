@@ -16,7 +16,7 @@ RUN mkdir -p /opt/.logs \
     && mkdir -p /apidef
 RUN chown -R 65532:65532 /opt/
 USER 65532
-COPY --from=build /build/target/dcat-ap-processor-0.0.3-SNAPSHOT.jar /opt/app.jar
+COPY --from=build /build/target/dcat-ap-se-processor-0.0.3-SNAPSHOT.jar /opt/app.jar
 
 ENV JDK_JAVA_OPTIONS -Duser.language=sv-SE -Duser.region=SE -Duser.timezone=Europe/Stockholm
 WORKDIR /opt

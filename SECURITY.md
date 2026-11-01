@@ -3,7 +3,7 @@
 To report a security vulnerability in this project privately, use GitHub's
 private vulnerability reporting:
 
-<https://github.com/diggsweden/DCAT-AP-SE-Processor/security/advisories/new>
+<https://github.com/diggsweden/dcat-ap-se-processor/security/advisories/new>
 
 You may also email ospo AT digg.se
 
