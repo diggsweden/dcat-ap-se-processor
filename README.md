@@ -2,9 +2,9 @@
 
 [![License: EUPL 1.2](https://img.shields.io/badge/License-European%20Union%20Public%20Licence%201.2-library?style=for-the-badge&&color=lightblue)](LICENSES/EUPL-1.2.txt)
 
-[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/diggsweden/DCAT-AP-SE-Processor/badge?style=for-the-badge)](https://scorecard.dev/viewer/?uri=github.com/diggsweden/DCAT-AP-SE-Processor)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/diggsweden/dcat-ap-se-processor/badge?style=for-the-badge)](https://scorecard.dev/viewer/?uri=github.com/diggsweden/dcat-ap-se-processor)
 
-[![REUSE status](https://img.shields.io/reuse/compliance/github.com%2Fdiggsweden%2FDCAT-AP-SE-Processor?style=for-the-badge)](https://api.reuse.software/info/github.com/diggsweden/DCAT-AP-SE-Processor)
+[![REUSE status](https://img.shields.io/reuse/compliance/github.com%2Fdiggsweden%2Fdcat-ap-se-processor?style=for-the-badge)](https://api.reuse.software/info/github.com/diggsweden/dcat-ap-se-processor)
 
 [![publiccode.yml](https://img.shields.io/badge/publiccode.yml-library?style=for-the-badge&color=orange)](publiccode.yml)
 
@@ -83,11 +83,11 @@ podman run -it --rm -p 8080:8080 dcatprocessor:latest
 Alternativt, finns det också en experimentell färdigbyggd image för att testa.
 
 ```text
-docker run ghcr.io/diggsweden/dcat-ap-processor:latest
+docker run ghcr.io/diggsweden/dcat-ap-se-processor:latest
 ```
 
 ```text
-podman run ghcr.io/diggsweden/dcat-ap-processor:latest
+podman run ghcr.io/diggsweden/dcat-ap-se-processor:latest
 ```
 
 **ANVÄND INTE OVAN IMAGE I PRODUKTIONSYFTEN** - Den är endast avsedd för lokal test, och inga garantier lämnas på säkerhetsuppdateringar med mera.
@@ -138,9 +138,9 @@ När argument skickas med körs den i CLI-läge och ingen webbserver startas.
 
 | Flagga | Värde | Beskrivning | Exempel |
 |--------|-------|-------------|---------|
-| `-f` | FIL | Konverterar en specifikationsfil (.raml, .yaml, .json) | `java -jar dcat-ap-processor-0.0.3-SNAPSHOT.jar -f api.yaml` |
-| `-d` | KATALOG | Konverterar alla specifikationsfiler i en katalog | `java -jar dcat-ap-processor-0.0.3-SNAPSHOT.jar -d ./specs` |
-| `-h` | - | Visa hjälpmenyn | `java -jar dcat-ap-processor-0.0.3-SNAPSHOT.jar -h` |
+| `-f` | FIL | Konverterar en specifikationsfil (.raml, .yaml, .json) | `java -jar dcat-ap-se-processor-0.0.3-SNAPSHOT.jar -f api.yaml` |
+| `-d` | KATALOG | Konverterar alla specifikationsfiler i en katalog | `java -jar dcat-ap-se-processor-0.0.3-SNAPSHOT.jar -d ./specs` |
+| `-h` | - | Visa hjälpmenyn | `java -jar dcat-ap-se-processor-0.0.3-SNAPSHOT.jar -h` |
 
 Endast en CLI-flagga kan användas per körning. Flaggorna `-f` och `-d` kräver ett värde i form av en fil- eller katalogsökväg, medan `-h` och `-help` används utan värde.
 
@@ -158,19 +158,19 @@ mvn clean package -DskipTests
 Konvertera en specifikationsfil, resultatet blir en RDF samt en kvalitets rapport, båda ges som fil och visas via stdout:
 
 ```text
-java -jar dcat-ap-processor-0.0.3-SNAPSHOT.jar -f FIL
+java -jar dcat-ap-se-processor-0.0.3-SNAPSHOT.jar -f FIL
 ```
 
 Konvertera en katalog med specifikationsfiler, resultatet blir en RDF samt en kvalitets rapport, båda ges som fil och visas via stdout:
 
 ```text
-java -jar dcat-ap-processor-0.0.3-SNAPSHOT.jar -d KATALOG
+java -jar dcat-ap-se-processor-0.0.3-SNAPSHOT.jar -d KATALOG
 ```
 
 Visa hjälpmenyn med information om tillgängliga flaggor och exempel på användning:
 
 ```text
-java -jar dcat-ap-processor-0.0.3-SNAPSHOT.jar -h
+java -jar dcat-ap-se-processor-0.0.3-SNAPSHOT.jar -h
 ```
 
 Hjälpmenyn kan även visas med -help. Båda alternativen avslutar programmet med exitkod 0.
