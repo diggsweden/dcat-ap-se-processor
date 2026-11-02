@@ -28,8 +28,8 @@ info:
     name: EUPL-1.2
     url: https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12
 externalDocs:
-  description: DCAT-AP-SE-processor repository
-  url: https://github.com/diggsweden/DCAT-AP-SE-Processor
+  description: DCAT-AP-SE-Processor repository
+  url: https://github.com/diggsweden/dcat-ap-se-processor
 paths:
   /dcat-generation/spec:
     post:

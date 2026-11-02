@@ -9,7 +9,7 @@
 publiccodeYmlVersion: '0.7'
 
 name: 'DCAT-AP-SE Processor'
-url: 'https://github.com/diggsweden/DCAT-AP-SE-Processor'
+url: 'https://github.com/diggsweden/dcat-ap-se-processor'
 
 softwareVersion: '0.9'
 releaseDate: '2022-10-01'

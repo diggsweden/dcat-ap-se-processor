@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>se.af</groupId>
-	<artifactId>dcat-ap-processor</artifactId>
+	<artifactId>dcat-ap-se-processor</artifactId>
 	<version>0.0.3-SNAPSHOT</version>
-	<name>dcat-ap-processor</name>
+	<name>dcat-ap-se-processor</name>
 	<description>Preprocessor - DCAT-AP-SE metadata</description>
 	<properties>
 		<java.version>25</java.version>

@@ -155,9 +155,9 @@ public class CliRunner implements ApplicationRunner {
                 DCAT-AP-SE Processor
 
                 Usage:
-                java -jar dcat-ap-processor.jar -f <file>
-                java -jar dcat-ap-processor.jar -d <directory>
-                java -jar dcat-ap-processor.jar -h
+                java -jar dcat-ap-se-processor.jar -f <file>
+                java -jar dcat-ap-se-processor.jar -d <directory>
+                java -jar dcat-ap-se-processor.jar -h
 
                 Options:
                   -f <file>       Generate RDF from a single file
@@ -165,8 +165,8 @@ public class CliRunner implements ApplicationRunner {
                   -h, -help       Show this help message
 
                 Examples:
-                  java -jar dcat-ap-processor.jar -f ./file/spec.json
-                  java -jar dcat-ap-processor.jar -d ./files
+                  java -jar dcat-ap-se-processor.jar -f ./file/spec.json
+                  java -jar dcat-ap-se-processor.jar -d ./files
                 """);
     }
 }
