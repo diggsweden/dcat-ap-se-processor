@@ -73,11 +73,13 @@ public class Converter {
 
     /*
      * Adds a correct about string to the Object */
-    void addAbout(DataClass dataObj, String value) {
-        if (!(value.contains("http"))) {
-            value = "http://" + value;
+    void addAbout(DataClass dataObj, String value, String key, Optional<String> subCat) {
+        Optional<String> uri = toUri(value);
+        if (uri.isEmpty()) {
+            addError(ErrorType.EMPTY_URI_VALUE, key, subCat, value);
+            return;
         }
-        dataObj.about = value;
+        dataObj.about = uri.get();
     }
 
     JSONObject getOrLoadLanguageFile() throws IOException {
@@ -167,9 +169,12 @@ public class Converter {
                 }
             }
             if (ConverterHelpClass.tagWithUri.contains(key)) {
-                if (!(mapValue.contains("http"))) {
-                    mapValue = "http://" + mapValue;
+                Optional<String> uri = toUri(mapValue);
+                if (uri.isEmpty()) {
+                    addError(ErrorType.EMPTY_URI_VALUE, key, subCat, mapValue);
+                    continue;
                 }
+                mapValue = uri.get();
             }
             if (key.contains("format")) {
                 key = "dcterms:format";
@@ -219,7 +224,7 @@ public class Converter {
 
     void addValues(DataClass dataObj, String value, String key, Optional<String> subCat) throws IOException {
         if (key.equals(ConverterHelpClass.toDcatAboutString)) {
-            addAbout(dataObj, value);
+            addAbout(dataObj, value, key, subCat);
         } else if (key.equals("vcard:hasTelephone")) {
             addPhone(dataObj, value);
         } else if (key.equals("Address")) {
@@ -312,6 +317,13 @@ public class Converter {
         String section = buildSection(subCat);
         ValidationError error = new ValidationError(errorType, sourceFilename, key, value, section);
         errors.add(error);
+    }
+
+    protected Optional<String> toUri(String value) {
+        if (value.isBlank() || value.equals("null")) {
+            return Optional.empty();
+        }
+        return Optional.of(value.contains("http") ? value : "http://" + value);
     }
 
     /*

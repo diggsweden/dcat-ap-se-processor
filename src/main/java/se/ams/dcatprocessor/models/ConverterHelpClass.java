@@ -4,16 +4,17 @@
 
 package se.ams.dcatprocessor.models;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+
 import org.eclipse.rdf4j.model.vocabulary.DCAT;
 import org.eclipse.rdf4j.model.vocabulary.DCTERMS;
 import org.eclipse.rdf4j.model.vocabulary.FOAF;
 import org.eclipse.rdf4j.model.vocabulary.PROV;
+
 import se.ams.dcatprocessor.rdf.namespace.SCHEMA;
 import se.ams.dcatprocessor.rdf.namespace.SPDX;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 
 public class ConverterHelpClass {
 
@@ -62,28 +63,28 @@ public class ConverterHelpClass {
     public static List<String> tagWithUri = Arrays.asList("about","foaf:homepage", "license", "homepage", "dcat:accessURL", "dcat:downloadURL", "dcat:landingPage",
             "dcterms:isReferencedBy", "dcterms:relation", "dcat:endpointURL", "dcat:endpointDescription", "dcat:accessService", "dcterms:relation", "dcat:qualifiedRelation",
             "dcat:landingPage", "odrs:attributionURL", "odrs:jurisdiction", "odrs:reuserGuidelines", "schema:mainEntityOfPage", "dcat:servesDataset", "dcat:hasVersion",
-            "dcterms:source");
+            "dcterms:source", "dcterms:spatial");
     public static List<String> tagWithUriMail = Arrays.asList("foaf:mbox", "vcard:hasEmail");
 
     public static Boolean isNestedObjects(String objectKeyName) {
-         if (objectKeyName.equals(DCAT.CONTACT_POINT.getLocalName()) ||
-                 objectKeyName.equals(DCTERMS.TEMPORAL.getLocalName()) ||
-                 objectKeyName.equals(DCTERMS.CREATOR.getLocalName()) ||
-                 objectKeyName.equals(DCTERMS.PUBLISHER.getLocalName()) ||
-                 objectKeyName.equals(DCTERMS.RIGHTS_STATEMENT.getLocalName()) ||
-                 objectKeyName.equals(PROV.ATTRIBUTION.getLocalName()) ||
-                 objectKeyName.equals(SPDX.CHECKSUM.getLocalName()) ||
-                 objectKeyName.equals(SCHEMA.OFFERS.getLocalName()) ||
-                 objectKeyName.equals(FOAF.DOCUMENT.getLocalName()) ||
-                 objectKeyName.equals(DCTERMS.STANDARD.getLocalName()) ||
-                 objectKeyName.equals(DCTERMS.LICENSE_DOCUMENT.getLocalName()) ||
-                 objectKeyName.equals(DCAT.QUALIFIED_RELATION.getLocalName()) ||
-                 objectKeyName.equals(DCTERMS.SPATIAL.getLocalName())) {
-             return true;
-         }
-         else {
-             return false;
-         }
+        if (objectKeyName.equals(DCAT.CONTACT_POINT.getLocalName()) ||
+                objectKeyName.equals(DCTERMS.TEMPORAL.getLocalName()) ||
+                objectKeyName.equals(DCTERMS.CREATOR.getLocalName()) ||
+                objectKeyName.equals(DCTERMS.PUBLISHER.getLocalName()) ||
+                objectKeyName.equals(DCTERMS.RIGHTS_STATEMENT.getLocalName()) ||
+                objectKeyName.equals(PROV.ATTRIBUTION.getLocalName()) ||
+                objectKeyName.equals(SPDX.CHECKSUM.getLocalName()) ||
+                objectKeyName.equals(SCHEMA.OFFERS.getLocalName()) ||
+                objectKeyName.equals(FOAF.DOCUMENT.getLocalName()) ||
+                objectKeyName.equals(DCTERMS.STANDARD.getLocalName()) ||
+                objectKeyName.equals(DCTERMS.LICENSE_DOCUMENT.getLocalName()) ||
+                objectKeyName.equals(DCAT.QUALIFIED_RELATION.getLocalName()) ||
+                objectKeyName.equals(DCTERMS.SPATIAL.getLocalName())) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     public static Boolean isNestedLanguageObjects(String objectKeyName) {
@@ -95,7 +96,7 @@ public class ConverterHelpClass {
                 objectKeyName.equals(DCTERMS.RIGHTS_STATEMENT.getLocalName()) ||
                 objectKeyName.equals(DCTERMS.PUBLISHER.getLocalName()) ||
                 objectKeyName.equals(DCTERMS.CREATOR.getLocalName()) ||
-                objectKeyName.equals(PROV.ATTRIBUTION.getLocalName()))          
+                objectKeyName.equals(PROV.ATTRIBUTION.getLocalName()))
                 {
             return true;
         }
