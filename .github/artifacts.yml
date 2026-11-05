@@ -10,6 +10,8 @@ artifacts:
     project-type: maven
     working-directory: .
     build-type: application
+    publish-to:
+      - github-packages
     config:
       java-version: 25
 
@@ -19,8 +21,3 @@ containers:
     container-file: Containerfile
     context: .
     platforms: linux/amd64,linux/arm64
-    registry: ghcr.io
-
-publishers:
-  - type: github-packages
-    artifacts: [dcat-ap-se-processor]
