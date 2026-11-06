@@ -1,0 +1,37 @@
+# SPDX-FileCopyrightText: 2022 Agency for Digital Government
+#
+# SPDX-License-Identifier: CC0-1.0
+
+name: Release
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+      - "v[0-9]+.[0-9]+.[0-9]+-alpha*"
+      - "v[0-9]+.[0-9]+.[0-9]+-beta*"
+      - "v[0-9]+.[0-9]+.[0-9]+-rc*"
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+permissions:
+  contents: read
+jobs:
+  release:
+    uses: diggsweden/reusable-ci/.github/workflows/release-orchestrator.yml@1a76b0c1a69952742ea663c8cfe77d8fe1d168ad # 3.1.0
+    permissions:
+      contents: write
+      pull-requests: read
+      packages: write
+      id-token: write
+      actions: read
+      attestations: write
+    secrets:
+      RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+      RELEASE_GPG_PRIVATE_KEY: ${{ secrets.RELEASE_GPG_PRIVATE_KEY }}
+      RELEASE_GPG_PASSPHRASE: ${{ secrets.RELEASE_GPG_PASSPHRASE }}
+      RELEASE_GPG_PUBLIC_KEY: ${{ secrets.RELEASE_GPG_PUBLIC_KEY }}
+    with:
+      reusable-ci-ref: 1a76b0c1a69952742ea663c8cfe77d8fe1d168ad # 3.1.0
+      artifacts-config: .github/artifacts.yml
+      changelog-creator: git-cliff
+      release-publisher: github-cli
