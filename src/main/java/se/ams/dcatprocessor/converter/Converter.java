@@ -34,6 +34,7 @@ public class Converter {
     JSONObject orgConvert;
     List<ValidationError> errors = new ArrayList<>();
     String sourceFilename;
+    final List<String> sectionPath = new ArrayList<>();
 
     void processToDcat(JSONObject subConvert, JSONObject file, Optional<String> subCat, Optional<DataClass> preData, Optional<DataClass> preDist) throws Exception {
     }
@@ -238,9 +239,11 @@ public class Converter {
         JSONObject subToConvert = (JSONObject) orgConvert.get(key);
         subToConvert.remove(ConverterHelpClass.toDcatMandatoryString);
         
-        if (subToConvert.keySet().size() > 0) {
+        if (!subToConvert.keySet().isEmpty()) {
             JSONObject subJsonFile = ((JSONObject) file.get(annotationName));
+            sectionPath.add(sectionPath.isEmpty() ? getSectionName() : annotationName);
             processToDcat(subToConvert, subJsonFile, Optional.ofNullable(newKey), preData, preDist);
+            sectionPath.removeLast();
         }
     }
 
@@ -314,8 +317,7 @@ public class Converter {
     }
 
     protected void addError(ErrorType errorType, String key, Optional<String> subCat, String value) {
-        String section = buildSection(subCat);
-        ValidationError error = new ValidationError(errorType, sourceFilename, key, value, section);
+        ValidationError error = new ValidationError(errorType, sourceFilename, key, value, buildSection());
         errors.add(error);
     }
 
@@ -334,12 +336,10 @@ public class Converter {
         return "";
     }
 
-    private String buildSection(Optional<String> subCat) {
-        String sectionName = getSectionName();
-
-        if (subCat.isEmpty() || subCat.get().equals(sectionName)) {
-            return sectionName;
+    private String buildSection() {
+        if (sectionPath.isEmpty()) {
+            return getSectionName();
         }
-        return sectionName + "." + subCat.get();
+        return String.join(".", sectionPath);
     }
 }
