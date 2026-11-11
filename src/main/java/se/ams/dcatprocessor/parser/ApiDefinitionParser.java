@@ -31,6 +31,8 @@ import se.ams.dcatprocessor.models.ApiSpecFile;
 import se.ams.dcatprocessor.rdf.DcatException;
 
 public class ApiDefinitionParser {
+    
+    public enum ApiSpecSyntax { JSON, YAML_RAML, UNKNOWN }
 
     // Top-level blocks that can appear directly in an input document.
     public static final List<String> TOP_LEVEL_DCAT_BLOCKS  = List.of(
@@ -39,19 +41,28 @@ public class ApiDefinitionParser {
         "dcat-dataservice",
         "dcat-datasetseries"
     );
+    
+
+    static ApiSpecSyntax detectSyntax(String fileString) {
+        String trimmed = fileString.trim();
+        if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
+            return ApiSpecSyntax.JSON;
+        }
+        String firstLine = trimmed.lines().findFirst().orElse("");
+        if (firstLine.contains("openapi") || firstLine.contains("RAML")) {
+            return ApiSpecSyntax.YAML_RAML;
+        }
+        return ApiSpecSyntax.UNKNOWN;
+    }
 
     public static ApiSpecFile getApiSpecFile(ApiSource source) throws DcatException {
         String fileString = source.content();
-        String apiJsonString;
-        String apiLine1 = fileString.lines().findFirst().orElse("");
 
-        if (apiLine1.contains("openapi") || apiLine1.contains("RAML")) {
-            apiJsonString = getFileApiYamlRaml(fileString);
-        } else if (apiLine1.contains("{")) {
-            apiJsonString = fileString;
-        } else {
-            throw new DcatException("Failed to read API definition: unrecognized format, expected an OpenAPI specification (YAML or JSON) or a RAML specification");
-        }
+        String apiJsonString = switch (detectSyntax(fileString)) {
+            case JSON -> fileString;
+            case YAML_RAML -> getFileApiYamlRaml(fileString);
+            case UNKNOWN -> throw new DcatException("Failed to read API definition: unrecognized format, expected an OpenAPI specification (YAML or JSON) or a RAML specification");
+        };
 
         JSONObject jsonObjectFile;
         try {
