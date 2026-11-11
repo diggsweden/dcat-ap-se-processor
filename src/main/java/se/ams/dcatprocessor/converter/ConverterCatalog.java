@@ -149,9 +149,12 @@ public class ConverterCatalog extends Converter {
                 }
             }
             if (ConverterHelpClass.tagWithUri.contains(key)) {
-                if (!(mapValue.contains("http"))) {
-                    mapValue = "http://" + mapValue;
+                Optional<String> uri = toUri(mapValue);
+                if (uri.isEmpty()) {
+                    addError(ErrorType.EMPTY_URI_VALUE, key, subCat, mapValue);
+                    continue;
                 }
+                mapValue = uri.get();
             }
             if (key.equals("license")) {
                 key = "dcterms:" + key;
@@ -166,7 +169,7 @@ public class ConverterCatalog extends Converter {
     @Override
     void addValues(DataClass dataObj, String value, String key, Optional<String> subCat) throws IOException {
         if (key.equals(ConverterHelpClass.toDcatAboutString)) {
-            addAbout(dataObj, value);
+            addAbout(dataObj, value, key, subCat);
         } else {
             addValue(dataObj.dcData, value, key, subCat);
         }
