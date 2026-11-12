@@ -40,9 +40,10 @@ public class CardinalityValidator {
 	 * @param dcatClass - The DCAT class to validate against (e.g., Dataset, Catalog, Distribution).
 	 * @param values - The input values to check
 	 * @param checkedElsewhere - A list of property URIs (e.g., "dcterms:publisher") that have already been validated
+	 * @param path - Path of the node
 	 * @throws DcatException - Is thrown if there is a disconformity
 	 */
-	public boolean validate(DcatClass dcatClass, MultiValuedMap<String, String> values, List<String> checkedElsewhere) {
+	public boolean validate(DcatClass dcatClass, MultiValuedMap<String, String> values, List<String> checkedElsewhere, String path) {
 	
 		//Check that the filename for the file being validated is set
 		Util.checkNotNull(currentFileName, ERROR_CURRENT_FILENAME_NOT_SET);
@@ -50,7 +51,6 @@ public class CardinalityValidator {
 		Map<String, DcatCardinality> cardinalities = cardinalityHandler.getCardinalities(dcatClass);
 		
 		HashMap<String, Integer> countedKeyNames = new HashMap<>();
-		String section = dcatClass.toString();
 
 		//Count the number of occurrences for each value-key E.g.dcterms:title and store in countValueName
 		Set<String> vKeySet = values.keySet();
@@ -64,7 +64,7 @@ public class CardinalityValidator {
 				/**
 				 * The key is unknown..a validationerror
 				 */
-				validationErrors.add(new ValidationError(currentFileName, vKey, section));
+				validationErrors.add(new ValidationError(currentFileName, vKey, path));
 			}
 		}
 
@@ -73,7 +73,7 @@ public class CardinalityValidator {
 		 * with the allowed range according to the specification
 		 */
 		Set<String> cKeySet = cardinalities.keySet();
-		for (String cKey : cKeySet) {		
+		for (String cKey : cKeySet) {
 			DcatCardinality c = cardinalities.get(cKey);
 			Integer number = countedKeyNames.get(cKey);
 
@@ -89,13 +89,13 @@ public class CardinalityValidator {
 					 * The specification specifies at least one .. create a validationerror
 					 */
 					if (c.isOneOrMore() && isRequired(c, values)) {
-						validationErrors.add(new ValidationError(currentFileName, cKey, 0, c, section));
+						validationErrors.add(new ValidationError(currentFileName, cKey, 0, c, path));
 					}
 				}
 				else {
 					// Check that the input value occurs within the allowed range
 					if(!c.isInsideCardinality(number)) {
-						validationErrors.add(new ValidationError(currentFileName, cKey, number, c, section));
+						validationErrors.add(new ValidationError(currentFileName, cKey, number, c, path));
 					}
 				}
 			}

@@ -243,7 +243,7 @@ public class RDFWorker {
 	 * @throws IOException - If there is an IOException
 	 */
 	private IRI[] createCatalog(Catalog catalog) throws DcatException, IOException{
-	
+		String path = DCAT.CATALOG.getLocalName();
 		IRI[] catalogAndAgent = new IRI[2];
 		
 		Util.checkNotNull(catalog, UNABLE_CREATE_MISSING_VALUES.replaceAll("X", "Catalog"));
@@ -261,25 +261,25 @@ public class RDFWorker {
 		 * 2. Occur within the range allowed in the specification
 		 */
 		List<String> checkedElsewhere = List.of("dcat:dataset", "dcterms:publisher"); //Items that will not be checked now
-		cardinalityValidator.validate(DcatClass.CATALOG, catalog.dcData, checkedElsewhere);
+		cardinalityValidator.validate(DcatClass.CATALOG, catalog.dcData, checkedElsewhere, path);
 		IRI catalogIRI = createIri(catalog.about);
 		
 		catalogAndAgent[0] = catalogIRI;
 		
-		IRI agentIRI = createAgent(catalog.publisher);
+		IRI agentIRI = createAgent(catalog.publisher, path);
 		catalogAndAgent[1] = agentIRI;
 		
-		addToModel(model, catalogIRI, catalog.dcData, DCAT.CATALOG.getLocalName());
+		addToModel(model, catalogIRI, catalog.dcData, path);
 				
 		/*
 		 * Add the Rights...if it exist
 		 */
-		addRights(catalogIRI, catalog.rights);
+		addRights(catalogIRI, catalog.rights, path);
 		
 		/*
 		 * Add locations as anonymous nodes
 		 */
-		addNodes(catalogIRI, DCTERMS.SPATIAL, DCTERMS.LOCATION, catalog.spatial);
+		addNodes(catalogIRI, DCTERMS.SPATIAL, DCTERMS.LOCATION, catalog.spatial, path);
 		
 		return catalogAndAgent;
 	}
@@ -287,9 +287,11 @@ public class RDFWorker {
 	/**
 	 * Creates a Agent with all its data @see <a href="http://xmlns.com/foaf/0.1/Agent">Agent</a>
 	 * @param agent - The object containing the data for Agent
+	 * @param parentPath - Path of the parent node
 	 * @return - The Agent
 	 */
-	private IRI createAgent(DataClass agent) {
+	private IRI createAgent(DataClass agent, String parentPath) {
+		String path = path(parentPath, FOAF.AGENT);
 		/**
 		 * Special check that subject exist and is valid URI because this is a stopping error
 		 */
@@ -300,13 +302,13 @@ public class RDFWorker {
 		 * 1. Are defined in the specification
 		 * 2. Occur within the range allowed in the specification
 		 */
-		cardinalityValidator.validate(DcatClass.AGENT, agent.dcData, List.of());
+		cardinalityValidator.validate(DcatClass.AGENT, agent.dcData, List.of(), path);
 
 		IRI agentIRI = SimpleValueFactory.getInstance().createIRI(agent.about);
 
 		model.add(agentIRI, RDF.TYPE, FOAF.AGENT);
 
-		addToModel(model, agentIRI, agent.dcData, FOAF.AGENT.getLocalName());
+		addToModel(model, agentIRI, agent.dcData, path);
 
 		return agentIRI;
 	}
@@ -320,6 +322,7 @@ public class RDFWorker {
 	 * @return - The Dataset
 	 */
 	private IRI createDataset(DataSet dataSet, IRI agentIRI) throws IOException {
+		String path = DCAT.DATASET.getLocalName();
 		/**
 		 * Special check that subject exist and is valid URI because this is a stopping error
 		 */
@@ -331,13 +334,13 @@ public class RDFWorker {
 		 * 2. Occur within the range allowed in the specification
 		 */
 		List<String> checkedElsewhere = List.of("dcterms:publisher", "dcterms:creator"); //Items that will not be checked now
-		cardinalityValidator.validate(DcatClass.DATASET, dataSet.dcData, checkedElsewhere);
+		cardinalityValidator.validate(DcatClass.DATASET, dataSet.dcData, checkedElsewhere, path);
 		
 		IRI dataSetIRI =  createIri(dataSet.about);
 		model.add(dataSetIRI, RDF.TYPE, DCAT.DATASET);
 		
 		//Add all values to dataset
-		addToModel(model, dataSetIRI, dataSet.dcData, DCAT.DATASET.getLocalName());
+		addToModel(model, dataSetIRI, dataSet.dcData, path);
 
 		//Add the reference to the external element publisher
 		model.add(dataSetIRI, DCTERMS.PUBLISHER, agentIRI);
@@ -346,7 +349,7 @@ public class RDFWorker {
 		 * Add creator
 		 */
 		if ((dataSet.creator != null) && !dataSet.creator.equals(null)) {
-			IRI CreatorIRI = createAgent(dataSet.creator);
+			IRI CreatorIRI = createAgent(dataSet.creator, path);
 			model.add(dataSetIRI, DCTERMS.CREATOR, CreatorIRI);
 		}
 
@@ -354,46 +357,46 @@ public class RDFWorker {
 		/*
 		 * Add locations as anonymous nodes
 		 */
-		addNodes(dataSetIRI, DCTERMS.SPATIAL, DCTERMS.LOCATION, dataSet.spatial);
+		addNodes(dataSetIRI, DCTERMS.SPATIAL, DCTERMS.LOCATION, dataSet.spatial, path);
 		
 		/*
 		 * Add temporals as anonymous nodes
 		 */
-		addNodes(dataSetIRI, DCTERMS.TEMPORAL, DCTERMS.PERIOD_OF_TIME, dataSet.temporals);
+		addNodes(dataSetIRI, DCTERMS.TEMPORAL, DCTERMS.PERIOD_OF_TIME, dataSet.temporals, path);
 		
 		/*
 		 * Add offers as anonymous nodes
 		 */
-		addNodes(dataSetIRI, SCHEMA.OFFERS, SCHEMA.OFFER, dataSet.offers);		
+		addNodes(dataSetIRI, SCHEMA.OFFERS, SCHEMA.OFFER, dataSet.offers, path);
 	
 		/*
 		 * Add the Uppfyller...conformsTo as anonymous nodes
 		 */
-		addNodes(dataSetIRI, DCTERMS.CONFORMS_TO, DCTERMS.STANDARD, dataSet.conformsTo);
+		addNodes(dataSetIRI, DCTERMS.CONFORMS_TO, DCTERMS.STANDARD, dataSet.conformsTo, path);
 		
 		/*
 		 * Add the Documentation...foaf:page as anonymous nodes
 		 */
-		addNodes(dataSetIRI, FOAF.PAGE, FOAF.DOCUMENT, dataSet.documents);
+		addNodes(dataSetIRI, FOAF.PAGE, FOAF.DOCUMENT, dataSet.documents, path);
 		
 		/*
 		 * Add the Relations...dcat:qualifiedRelation as anonymous nodes
 		 */
-		addNodes(dataSetIRI, DCAT.QUALIFIED_RELATION, DCAT.RELATIONSHIP, dataSet.qualifiedRelations);
+		addNodes(dataSetIRI, DCAT.QUALIFIED_RELATION, DCAT.RELATIONSHIP, dataSet.qualifiedRelations, path);
 		
 		/*
 		 * Add Provenance...dcterms:provenance as anonymous nodes
 		 */
-		addNodes(dataSetIRI, DCTERMS.PROVENANCE_STATEMENT, DCTERMS.PROVENANCE, dataSet.provenances);
+		addNodes(dataSetIRI, DCTERMS.PROVENANCE_STATEMENT, DCTERMS.PROVENANCE, dataSet.provenances, path);
 		
 		/*
 		 * Add the Övrig aktör ...prov:qualifiedAttribution as anonymous nodes
 		 * Different from other anonymous nodes since it has an Agent(complex type)
 		 */
 		for (DataClass dataClass : dataSet.otherAgents) {
-			List<Resource> anonymousNodesList = addNodes(dataSetIRI, PROV.QUALIFIED_ATTRIBUTION, PROV.ATTRIBUTION, List.of(dataClass));
+			List<Resource> anonymousNodesList = addNodes(dataSetIRI, PROV.QUALIFIED_ATTRIBUTION, PROV.ATTRIBUTION, List.of(dataClass), path);
 			
-			IRI tmpAgentIRI = createAgent(dataClass.agent);
+			IRI tmpAgentIRI = createAgent(dataClass.agent, path(path, PROV.ATTRIBUTION));
 			
 			model.add(anonymousNodesList.get(0), PROV.AGENT_PROP, tmpAgentIRI);
 		}
@@ -404,7 +407,7 @@ public class RDFWorker {
 		 * add the reference from DataSet to ContactPoints
 		 */
 		for (Organization org : dataSet.organizations) {
-			IRI organizationIRI = createOrganization(org);
+			IRI organizationIRI = createOrganization(org, path);
 			model.add(dataSetIRI, DCAT.CONTACT_POINT, organizationIRI);
 		}
 
@@ -413,35 +416,37 @@ public class RDFWorker {
 		 * add the reference from DataSet to Distributions
 		 */
 		for (Distribution distribution : dataSet.dcat_distribution) {
-			IRI distributionIRI = createDistribution(distribution);
+			IRI distributionIRI = createDistribution(distribution, path);
 			model.add(dataSetIRI, DCAT.HAS_DISTRIBUTION, distributionIRI);
 		}
 
 		return dataSetIRI;
 	}
 	
-	private void addRights(@NonNull IRI parentIRI, @NonNull DataClass rights) {
+	private void addRights(@NonNull IRI parentIRI, @NonNull DataClass rights, String parentPath) {
 		
 		if(Util.isNullOrEmpty(rights)) {
 			return;
 		}
+
+		String rightsPath = path(parentPath, ODRS.RIGHTS_STATEMENT);
 		
 		/**
 		 * Create the rights node as anonymous nodes with reference to parent node
 		 */
-		List<Resource> rightsNodesList = addNodes(parentIRI, DCTERMS.RIGHTS, ODRS.RIGHTS_STATEMENT, List.of(rights));
+		List<Resource> rightsNodesList = addNodes(parentIRI, DCTERMS.RIGHTS, ODRS.RIGHTS_STATEMENT, List.of(rights), parentPath);
 		
 		/**
 		 * Create the license documents as anonymous nodes with reference to the Rights node
 		 */
-		addNodes(rightsNodesList.get(0), ODRS.COPYRIGHT_STATEMENT, DCTERMS.LICENSE_DOCUMENT, rights.licenseDocuments);
+		addNodes(rightsNodesList.get(0), ODRS.COPYRIGHT_STATEMENT, DCTERMS.LICENSE_DOCUMENT, rights.licenseDocuments, rightsPath);
 		
 		/*
 		 * Create Agents(publishers) and add them to the model and 
 		 * then add the reference from DataService to Agents(publishers) 
 		 */
 		for (DataClass agent : rights.agents) {
-			IRI agentIRI = createAgent(agent);
+			IRI agentIRI = createAgent(agent, rightsPath);
 			model.add(rightsNodesList.get(0), ODRS.COPYRIGHT_HOLDER, agentIRI);
 		}
 
@@ -451,9 +456,11 @@ public class RDFWorker {
 	 * Creates a Distribution with all its data
 	 * @see <a href="http://www.w3.org/ns/dcat#Distribution">Distribution</a>
 	 * @param distribution The object containing the data for Distribution
+	 * @param parentPath - Path of the parent node
 	 * @return The Distribution
 	 */
-	private IRI createDistribution(Distribution distribution) throws IOException {
+	private IRI createDistribution(Distribution distribution, String parentPath) throws IOException {
+		String path = path(parentPath, DCAT.DISTRIBUTION);
 		/**
 		 * Special check that subject exist and is valid URI because this is a stopping error
 		 */
@@ -465,44 +472,44 @@ public class RDFWorker {
 		 * 2. Occur within the range allowed in the specification
 		 */
 		List<String> checkedElsewhere = List.of("dcat:accessService"); //Items that will not be checked now
-		cardinalityValidator.validate(DcatClass.DISTRIBUTION, distribution.dcData, checkedElsewhere);
+		cardinalityValidator.validate(DcatClass.DISTRIBUTION, distribution.dcData, checkedElsewhere, path);
 		
 		IRI distributionIRI = createIri(distribution.about);
 		model.add(distributionIRI, RDF.TYPE, DCAT.DISTRIBUTION);
 		
 		//Add all values to Organization
-		addToModel(model, distributionIRI, distribution.dcData, DCAT.DISTRIBUTION.getLocalName());
+		addToModel(model, distributionIRI, distribution.dcData, path);
 		
 		/*
 		 * Add the Uppfyller...conformsTo as anonymous nodes
 		 */
-		addNodes(distributionIRI, DCTERMS.CONFORMS_TO, DCTERMS.STANDARD, distribution.conformsTo);
+		addNodes(distributionIRI, DCTERMS.CONFORMS_TO, DCTERMS.STANDARD, distribution.conformsTo, path);
 
 		/*
 		 * Add the licensedocuments as anonymous nodes
 		 */
-		addNodes(distributionIRI, DCTERMS.LICENSE, DCTERMS.LICENSE_DOCUMENT, distribution.licenseDocuments);
+		addNodes(distributionIRI, DCTERMS.LICENSE, DCTERMS.LICENSE_DOCUMENT, distribution.licenseDocuments, path);
 			
 		/*
 		 * Add the Documentation...foaf:page as anonymous nodes
 		 */
-		addNodes(distributionIRI, FOAF.PAGE, FOAF.DOCUMENT, distribution.documents);
+		addNodes(distributionIRI, FOAF.PAGE, FOAF.DOCUMENT, distribution.documents, path);
 		
 		/*
 		 * Add the Rights...if it exist
 		 */
-		addRights(distributionIRI, distribution.rights);
+		addRights(distributionIRI, distribution.rights, path);
 		
 		/*
 		 * Add CheckSum...if it exist
 		 */
 		if(Util.isNotNullOrEmpty(distribution.checksum)) {
-			addNodes(distributionIRI, SPDX.CHECKSUMS, SPDX.CHECKSUM, List.of(distribution.checksum));
+			addNodes(distributionIRI, SPDX.CHECKSUMS, SPDX.CHECKSUM, List.of(distribution.checksum), path);
 		}
 		
 		/*
-		 * Create DataServices and add them to the model and 
-		 * then add the reference from Distribution to DataServices 
+		 * Create DataServices and add them to the model and
+		 * then add the reference from Distribution to DataServices
 		 */
 		for (DataService dataService : distribution.dataServices) {
 			IRI dataServiceIRI = createDataService(dataService);
@@ -519,6 +526,7 @@ public class RDFWorker {
 	 * @return DataService - The Dataservice
 	 */
 	private IRI createDataService(DataService dataService) throws IOException {
+		String path = DCAT.DATA_SERVICE.getLocalName();
 		/**
 		 * Special check that subject exist and is valid URI because this is a stopping error
 		 */		
@@ -530,35 +538,35 @@ public class RDFWorker {
 		 * 2. Occur within the range allowed in the specification
 		 */
 		List<String> checkedElsewhere = List.of("dcterms:publisher", "dcat:contactPoint"); //Items that will not be checked now
-		cardinalityValidator.validate(DcatClass.DATASERVICE, dataService.dcData, checkedElsewhere);
+		cardinalityValidator.validate(DcatClass.DATASERVICE, dataService.dcData, checkedElsewhere, path);
 		
 		IRI dataServiceIRI = createIri(dataService.about);
 		model.add(dataServiceIRI, RDF.TYPE, DCAT.DATA_SERVICE);
 		
 		//Add all simple values to Dataservice
-		addToModel(model, dataServiceIRI, dataService.dcData, DCAT.DATA_SERVICE.getLocalName());
+		addToModel(model, dataServiceIRI, dataService.dcData, path);
 		
 		/*
 		 * Add the Uppfyller...conformsTo as anonymous nodes
 		 */
-		addNodes(dataServiceIRI, DCTERMS.CONFORMS_TO, DCTERMS.STANDARD, dataService.conformsTo);
+		addNodes(dataServiceIRI, DCTERMS.CONFORMS_TO, DCTERMS.STANDARD, dataService.conformsTo, path);
 		
 		/*
 		 * Add the licensedocuments as anonymous nodes
 		 */
-		addNodes(dataServiceIRI, DCTERMS.LICENSE, DCTERMS.LICENSE_DOCUMENT, dataService.licenseDocuments);
+		addNodes(dataServiceIRI, DCTERMS.LICENSE, DCTERMS.LICENSE_DOCUMENT, dataService.licenseDocuments, path);
 		
 		/*
 		 * Add the Documentation...foaf:page as anonymous nodes
 		 */
-		addNodes(dataServiceIRI, FOAF.PAGE, FOAF.DOCUMENT, dataService.documents);
+		addNodes(dataServiceIRI, FOAF.PAGE, FOAF.DOCUMENT, dataService.documents, path);
 		
 		/*
 		 * Create Agents(publishers) and add them to the model and 
 		 * then add the reference from DataService to Agents(publishers) 
 		 */
 		for (DataClass agent : dataService.agents) {
-			IRI agentIRI = createAgent(agent);
+			IRI agentIRI = createAgent(agent, path);
 			model.add(dataServiceIRI, DCTERMS.PUBLISHER, agentIRI);
 		}
 
@@ -567,7 +575,7 @@ public class RDFWorker {
 		 * then add the reference from DataService to Organizations 
 		 */
 		for (Organization organization : dataService.organizations) {
-			IRI organizationIRI = createOrganization(organization);
+			IRI organizationIRI = createOrganization(organization, path);
 			model.add(dataServiceIRI, DCAT.CONTACT_POINT, organizationIRI);
 		}
 		
@@ -581,43 +589,46 @@ public class RDFWorker {
 	 * @return DatasetSeries - The DatasetSeries
 	 */
 	private IRI createDatasetSeries(DatasetSeries datasetSeries, IRI agentIRI) throws IOException {
+		String path = DCAT.DATASET_SERIES.getLocalName();
 		/**
 		 * Special check that subject exist and is valid URI because this is a stopping error
-		 */	
-    	checkSubject("DatasetSeries.about", datasetSeries.about);
+		 */
+		checkSubject("DatasetSeries.about", datasetSeries.about);
 
     	List<String> checkedElsewhere = List.of("dcterms:publisher"); //Items that will not be checked now
-		cardinalityValidator.validate(DcatClass.DATASETSERIES, datasetSeries.dcData, checkedElsewhere);
+		cardinalityValidator.validate(DcatClass.DATASETSERIES, datasetSeries.dcData, checkedElsewhere, path);
 
-    	IRI datasetSeriesIRI = createIri(datasetSeries.about);
-    	model.add(datasetSeriesIRI, RDF.TYPE, DCAT.DATASET_SERIES);
+		IRI datasetSeriesIRI = createIri(datasetSeries.about);
+		model.add(datasetSeriesIRI, RDF.TYPE, DCAT.DATASET_SERIES);
 
-    	addToModel(model, datasetSeriesIRI, datasetSeries.dcData, DCAT.DATASET_SERIES.getLocalName());
+		addToModel(model, datasetSeriesIRI, datasetSeries.dcData, path);
 
 		//Add the reference to the external element publisher (publisher from Catalog)
-    	model.add(datasetSeriesIRI, DCTERMS.PUBLISHER, agentIRI);
+		model.add(datasetSeriesIRI, DCTERMS.PUBLISHER, agentIRI);
 
-    	addNodes(datasetSeriesIRI, DCTERMS.SPATIAL, DCTERMS.LOCATION, datasetSeries.spatial);
-    	addNodes(datasetSeriesIRI, DCTERMS.TEMPORAL, DCTERMS.PERIOD_OF_TIME, datasetSeries.temporals);
-    	addNodes(datasetSeriesIRI, DCTERMS.CONFORMS_TO, DCTERMS.STANDARD, datasetSeries.conformsTo);
-    	addNodes(datasetSeriesIRI, FOAF.PAGE, FOAF.DOCUMENT, datasetSeries.documents);
-		addNodes(datasetSeriesIRI, DCAT.QUALIFIED_RELATION, DCAT.RELATIONSHIP, datasetSeries.qualifiedRelations);
+		addNodes(datasetSeriesIRI, DCTERMS.SPATIAL, DCTERMS.LOCATION, datasetSeries.spatial, path);
+		addNodes(datasetSeriesIRI, DCTERMS.TEMPORAL, DCTERMS.PERIOD_OF_TIME, datasetSeries.temporals, path);
+		addNodes(datasetSeriesIRI, DCTERMS.CONFORMS_TO, DCTERMS.STANDARD, datasetSeries.conformsTo, path);
+		addNodes(datasetSeriesIRI, FOAF.PAGE, FOAF.DOCUMENT, datasetSeries.documents, path);
+		addNodes(datasetSeriesIRI, DCAT.QUALIFIED_RELATION, DCAT.RELATIONSHIP, datasetSeries.qualifiedRelations, path);
 
-    	for (Organization org : datasetSeries.organizations) {
-    	    IRI organizationIRI = createOrganization(org);
-    	    model.add(datasetSeriesIRI, DCAT.CONTACT_POINT, organizationIRI);
-    	}
+		for (Organization org : datasetSeries.organizations) {
+			IRI organizationIRI = createOrganization(org, path);
+			model.add(datasetSeriesIRI, DCAT.CONTACT_POINT, organizationIRI);
+		}
 
-    	return datasetSeriesIRI;
+		return datasetSeriesIRI;
 	}
 	
 	/**
 	 * Creates a ContactPoint with all its data
 	 * @see <a href="http://www.w3.org/ns/dcat#Organization">Organization</a>
 	 * @param org - The object containing the data for Organization
+	 * @param parentPath - Path of the parent node
 	 * @return - The Organization
 	 */
-	private IRI createOrganization(Organization org) throws IOException {
+	private IRI createOrganization(Organization org, String parentPath) throws IOException {
+		String path = path(parentPath, VCARD4.ORGANIZATION);
 		/**
 		 * Special check that subject exist and is valid URI because this is a stopping error
 		 */
@@ -629,23 +640,23 @@ public class RDFWorker {
 		 * 2. Occur within the range allowed in the specification
 		 */
 		List<String> checkedElsewhere = List.of("vcard:hasTelephone", "vcard:hasAddress"); //Items that will not be checked now
-		cardinalityValidator.validate(DcatClass.ORGANISATION, org.dcData, checkedElsewhere);
+		cardinalityValidator.validate(DcatClass.ORGANISATION, org.dcData, checkedElsewhere, path);
 				
 		IRI organizationIRI = createIri(org.about);
 		model.add(organizationIRI, RDF.TYPE, VCARD4.ORGANIZATION);
 
 		//Add all simple values to Organization
-		addToModel(model, organizationIRI, org.dcData, VCARD4.ORGANIZATION.getLocalName());
+		addToModel(model, organizationIRI, org.dcData, path);
 
 		/*
 		 * Add addresses as anonymous nodes
 		 */
-		addNodes(organizationIRI, VCARD4.HAS_ADDRESS, VCARD4.ADDRESS, org.adress);
+		addNodes(organizationIRI, VCARD4.HAS_ADDRESS, VCARD4.ADDRESS, org.adress, path);
 		
 		/*
 		 * Add phones as anonymous nodes
 		 */
-		addNodes(organizationIRI, VCARD4.HAS_TELEPHONE, VCARD4.VOICE, org.phone);
+		addNodes(organizationIRI, VCARD4.HAS_TELEPHONE, VCARD4.VOICE, org.phone, path);
 		
 		return organizationIRI;
 	}
@@ -657,10 +668,12 @@ public class RDFWorker {
 	 * @param parentIRINodeTypeRef - Parent node reference type
 	 * @param nodeType - Type of node
 	 * @param dataClasses - Placeholder for data to be added to this node
+	 * @param parentPath - Path of the parent node
 	 * @return The list of created BNodes
 	 */
-	private List<Resource> addNodes(@NonNull Resource parentIRI, @NonNull IRI parentIRINodeTypeRef, @NonNull IRI nodeType, @NonNull List<DataClass> dataClasses) {
+	private List<Resource> addNodes(@NonNull Resource parentIRI, @NonNull IRI parentIRINodeTypeRef, @NonNull IRI nodeType, @NonNull List<DataClass> dataClasses, String parentPath) {
 		List<Resource> resources = new ArrayList<>();
+		String nodePath = path(parentPath, nodeType);
 		
 		ValueFactory valueFactory = SimpleValueFactory.getInstance();
 		
@@ -678,7 +691,7 @@ public class RDFWorker {
 			
 			model.add(parentIRI, parentIRINodeTypeRef, resource);	//Add reference from parent IRI
 			model.add(resource, RDF.TYPE, nodeType);
-			addDataToNode(resource, dataClass.dcData, nodeType.getLocalName());	//Add data to node
+			addDataToNode(resource, dataClass.dcData, nodePath);	//Add data to node
 			
 			resources.add(resource);
 		}
@@ -690,9 +703,9 @@ public class RDFWorker {
 	 * Adds the values in valueMap to the node
 	 * @param resource - The node to add value to
 	 * @param valueMap - Containing the data to be added
-	 * @param section - The section where the node is located (Datset, DatasetService etc. )
+	 * @param path - Path to the node, e.g. Dataset.PeriodOfTime
 	 */
-	private void addDataToNode(Resource resource, MultiValuedMap<String, String> valueMap, String section) {
+	private void addDataToNode(Resource resource, MultiValuedMap<String, String> valueMap, String path) {
 		
 		ValueFactory valueFactory = SimpleValueFactory.getInstance();
 		
@@ -708,7 +721,7 @@ public class RDFWorker {
 				
 				for (String value : values) {
 					
-					singleInputValidator.validateData(key, value, section);
+					singleInputValidator.validateData(key, value, path);
 					
 					if (isWKTLiteral(key)) {
 					    model.add(resource, iri, valueFactory.createLiteral(value, GEO.WKT_LITERAL));
@@ -742,6 +755,10 @@ public class RDFWorker {
 	private IRI createIri(String uriString) {
 		multipleURIValidator.addUri(uriString);
 		return SimpleValueFactory.getInstance().createIRI(uriString);
+	}
+
+	private static String path(String parent, IRI type) {
+		return parent.isEmpty() ? type.getLocalName() : parent + "." + type.getLocalName();
 	}
 	
 	/**
@@ -838,10 +855,10 @@ public class RDFWorker {
 	 * @param model - The model to add the values to
 	 * @param sectionIRI - The section where the values are added
 	 * @param valueMap - The map containing the values
-	 * @param section - The section where the key is located (Datset, DatasetService etc. )
+	 * @param path - Path to the node, e.g. Dataset.Distribution.
 	 */
 
-	private void addToModel(Model model, IRI sectionIRI, MultiValuedMap<String, String> valueMap, String section) {
+	private void addToModel(Model model, IRI sectionIRI, MultiValuedMap<String, String> valueMap, String path) {
 		ValueFactory valueFactory = SimpleValueFactory.getInstance();
 		Set<String> keySet = valueMap.keySet();
 		
@@ -855,7 +872,7 @@ public class RDFWorker {
 
 				for (String value : values) {
 
-					singleInputValidator.validateData(key, value, section);
+					singleInputValidator.validateData(key, value, path);
 					
 					/**
 					 * First check if its a numeric value...otherwise it might be interpreted as date value further down
