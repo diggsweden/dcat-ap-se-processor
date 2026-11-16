@@ -39,7 +39,7 @@ class CardinalityValidatorTest {
 	@Test
 	void testThatValidateFailsWhenFilenameNotSet() throws Exception {
 		try {
-			cardinalityValidator.validate(DcatClass.CATALOG, new ArrayListValuedHashMap<>(), new ArrayList<>());
+			cardinalityValidator.validate(DcatClass.CATALOG, new ArrayListValuedHashMap<>(), new ArrayList<>(), "Dataset.title");
 			fail("Expected exception when current filename is not set in CardinalityValidator");
 		} catch (DcatException e) {
 			assertEquals(CardinalityValidator.class + " Error validating input data. Reason: Filename for the file being validated is not set", e.getMessage());

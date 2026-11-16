@@ -4,8 +4,7 @@
 
 package se.ams.dcatprocessor.rdf;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -432,6 +431,84 @@ class RDFWorkerTest {
 			String description = "The key " + removedKey + " occurs 0 times but the allowed range is 1..n";
 			TestHelper.assertOneValidationError(e.getValidationResults(), testFileStorageList1.get(0).fileName, ErrorType.VALUE_OUTSIDE_OF_SPEC, removedKey, null, description);
 		}
+	}
+
+	@Test
+	void testThatNestedNodeErrorSectionIncludesParent() {
+		DataClass temporal = testFileStorageList1.get(0).dcat_dataset.get(1).temporals.get(0);
+		temporal.dcData.remove("dcat:startDate");
+		temporal.dcData.put("dcat:startDate", "2021-03-16abc");
+
+		DcatException exception = assertThrows(DcatException.class,
+			() -> rdfWorker.createDcatFile(testCatalog1, testFileStorageList1));
+
+		List<ValidationError> errors = exception.getValidationResults();
+		assertEquals(1, errors.size());
+		assertEquals("Dataset.PeriodOfTime", errors.get(0).getSection());
+	}
+
+	@Test
+	void testThatDeeplyNestedRightsErrorSectionIncludesFullPath() {
+		Distribution distribution = testFileStorageList1.get(0).dcat_dataset.get(0).dcat_distribution.get(0);
+		distribution.rights.dcData.remove("odrs:attributionURL");
+		distribution.rights.dcData.put("odrs:attributionURL", "not-a-url");
+
+		DcatException exception = assertThrows(DcatException.class,
+			() -> rdfWorker.createDcatFile(testCatalog1, testFileStorageList1));
+
+		List<ValidationError> errors = exception.getValidationResults();
+		assertEquals(1, errors.size());
+		assertEquals("Dataset.Distribution.RightsStatement", errors.get(0).getSection());
+	}
+
+	@Test
+	void testThatOrganizationPhoneErrorSectionIncludesFullPath() {
+		DataClass phone = testFileStorageList1.get(0).dcat_dataset.get(0).organizations.get(1).phone.get(0);
+		phone.dcData.remove("vcard:hasValue");
+		phone.dcData.put("vcard:hasValue", "tel:abc");
+		DcatException exception = assertThrows(DcatException.class,
+			() -> rdfWorker.createDcatFile(testCatalog1, testFileStorageList1));
+
+		List<ValidationError> errors = exception.getValidationResults();
+		assertEquals(1, errors.size());
+		assertEquals("Dataset.Organization.Voice", errors.get(0).getSection());
+	}
+
+	@Test
+	void testThatDistributionErrorSectionIncludesDataset() {
+		Distribution distribution = testFileStorageList1.get(0).dcat_dataset.get(0).dcat_distribution.get(0);
+		distribution.dcData.remove("dcat:accessURL");
+		distribution.dcData.put("dcat:accessURL", "not-a-url");
+
+		DcatException exception = assertThrows(DcatException.class,
+			() -> rdfWorker.createDcatFile(testCatalog1, testFileStorageList1));
+
+		List<ValidationError> errors = exception.getValidationResults();
+		assertEquals(1, errors.size());
+		assertEquals("Dataset.Distribution", errors.get(0).getSection());
+	}
+
+	@Test
+	void testThatAgentErrorSectionIncludesParent() {
+		testCatalog1.publisher.dcData.put("foaf:homepage", "not-a-url");
+
+		DcatException exception = assertThrows(DcatException.class,
+			() -> rdfWorker.createDcatFile(testCatalog1, testFileStorageList1));
+
+		ValidationError error = TestHelper.findValidationError(exception.getValidationResults(), ErrorType.ILLEGAL_FORMAT, "not-a-url");
+		assertEquals("Catalog.Agent", error.getSection());
+	}
+
+	@Test
+	void testThatCardinalityErrorSectionIncludesParent() {
+		testFileStorageList1.get(0).dcat_dataset.get(0).dcat_distribution.get(0).dcData.remove("dcat:accessURL");
+
+		DcatException exception = assertThrows(DcatException.class,
+			() -> rdfWorker.createDcatFile(testCatalog1, testFileStorageList1));
+
+		List<ValidationError> errors = exception.getValidationResults();
+		assertEquals(1, errors.size());
+		assertEquals("Dataset.Distribution", errors.get(0).getSection());
 	}
 
 	/**
