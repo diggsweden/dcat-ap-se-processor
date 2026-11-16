@@ -59,8 +59,8 @@ public class ConverterErrorPropagationTest {
         Path modified = TestHelper.copyWith(Path.of(API_DEF_FILE), tempDir,
             json -> {
                 JSONObject dataset = json.getJSONObject("info")
-                                         .getJSONObject("x-dcat")
-                                         .getJSONObject("dcat-dataset");
+                                        .getJSONObject("x-dcat")
+                                        .getJSONObject("dcat-dataset");
                 dataset.getJSONObject("distribution").remove("accessURL");
                 dataset.remove("title-sv");
             });
@@ -102,8 +102,24 @@ public class ConverterErrorPropagationTest {
         DcatResult result = manager.createDcatFromFile(modified.toString());
         String report = result.errorReport();
 
-        assertTrue(report.contains("DataService.Standard"), "conformsTo maps to Standard");
-        assertTrue(report.contains("DataService.LicenseDocument"), "licensedoc maps to LicenseDocument");
-        assertTrue(report.contains("DataService.Document"), "page maps to Document");
+        assertTrue(report.contains("DataService.conformsTo"), report);
+        assertTrue(report.contains("DataService.licensedoc"), report);
+        assertTrue(report.contains("DataService.page"), report);
+    }
+
+    @Test
+    void testThatErrorInDeeplyNestedBlockIsReportedWithFullPath(@TempDir Path tempDir) throws IOException {
+        Path modified = TestHelper.copyWith(Path.of(API_DEF_FILE), tempDir,
+            json -> json.getJSONObject("info")
+                        .getJSONObject("x-dcat")
+                        .getJSONObject("dcat-dataset")
+                        .getJSONObject("distribution")
+                        .getJSONObject("rights")
+                        .getJSONObject("copyrightHolder").put("about", ""));
+
+        DcatResult result = manager.createDcatFromFile(modified.toString());
+        String report = result.errorReport();
+
+        assertTrue(report.contains("Dataset.distribution.rights.copyrightHolder: about"), report);
     }
 }

@@ -29,7 +29,8 @@ public class ValidationError {
 		UNKNOWN_VALUE,
 		ILLEGAL_FORMAT,
 		ADDRESS_TO_FEW,
-		ADDRESS_TO_MANY
+		ADDRESS_TO_MANY,
+		EMPTY_URI_VALUE
 	}
 	
 	private final ErrorType errorType;
@@ -70,6 +71,7 @@ public class ValidationError {
 	private static final String ERROR_MANDATORY_VALUE_MISSING = "The key %s is mandatory";
 	private static final String ERROR_ADDRESS_TO_FEW = "Address has too few values, should contain street-address, postal-code, locality and country-name, separated with ;";
 	private static final String ERROR_ADDRESS_TO_MANY = "Address has too many values, should contain street-address, postal-code, locality and country-name, separated with ;";
+	private static final String ERROR_EMPTY_URI_VALUE = "The key %s must not be empty";
 
 	private final String UNABLE_ADD_VALIDATION_ERROR_CURRENT_FILE_MISSING = this.getClass() + " : Error validating input data. Reason: Current filename is not set";
 
@@ -195,6 +197,7 @@ public class ValidationError {
             case ErrorType.ILLEGAL_FORMAT -> ERROR_DESCRIPTION_ILLEGAL_FORMAT.formatted(value, key);
             case ErrorType.DUPLICATE_URI_WITHIN_FILE -> ERROR_DESCRIPTION_DUPLICATE_WITHIN_FILE.formatted(value, fileName);
             case ErrorType.DUPLICATE_URI_BETWEEN_FILES -> ERROR_DESCRIPTION_DUPLICATE_BETWEEN_FILES.formatted(value, fileName);
+			case ErrorType.EMPTY_URI_VALUE -> ERROR_EMPTY_URI_VALUE.formatted(key);
             default -> ERROR_DESCRIPTION_GENERAL.formatted(key, value);
         };
 	}

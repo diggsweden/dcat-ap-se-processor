@@ -34,6 +34,7 @@ public class Converter {
     JSONObject orgConvert;
     List<ValidationError> errors = new ArrayList<>();
     String sourceFilename;
+    final List<String> sectionPath = new ArrayList<>();
 
     void processToDcat(JSONObject subConvert, JSONObject file, Optional<String> subCat, Optional<DataClass> preData, Optional<DataClass> preDist) throws Exception {
     }
@@ -73,11 +74,13 @@ public class Converter {
 
     /*
      * Adds a correct about string to the Object */
-    void addAbout(DataClass dataObj, String value) {
-        if (!(value.contains("http"))) {
-            value = "http://" + value;
+    void addAbout(DataClass dataObj, String value, String key, Optional<String> subCat) {
+        Optional<String> uri = toUri(value);
+        if (uri.isEmpty()) {
+            addError(ErrorType.EMPTY_URI_VALUE, key, subCat, value);
+            return;
         }
-        dataObj.about = value;
+        dataObj.about = uri.get();
     }
 
     JSONObject getOrLoadLanguageFile() throws IOException {
@@ -167,9 +170,12 @@ public class Converter {
                 }
             }
             if (ConverterHelpClass.tagWithUri.contains(key)) {
-                if (!(mapValue.contains("http"))) {
-                    mapValue = "http://" + mapValue;
+                Optional<String> uri = toUri(mapValue);
+                if (uri.isEmpty()) {
+                    addError(ErrorType.EMPTY_URI_VALUE, key, subCat, mapValue);
+                    continue;
                 }
+                mapValue = uri.get();
             }
             if (key.contains("format")) {
                 key = "dcterms:format";
@@ -219,7 +225,7 @@ public class Converter {
 
     void addValues(DataClass dataObj, String value, String key, Optional<String> subCat) throws IOException {
         if (key.equals(ConverterHelpClass.toDcatAboutString)) {
-            addAbout(dataObj, value);
+            addAbout(dataObj, value, key, subCat);
         } else if (key.equals("vcard:hasTelephone")) {
             addPhone(dataObj, value);
         } else if (key.equals("Address")) {
@@ -233,9 +239,11 @@ public class Converter {
         JSONObject subToConvert = (JSONObject) orgConvert.get(key);
         subToConvert.remove(ConverterHelpClass.toDcatMandatoryString);
         
-        if (subToConvert.keySet().size() > 0) {
+        if (!subToConvert.keySet().isEmpty()) {
             JSONObject subJsonFile = ((JSONObject) file.get(annotationName));
+            sectionPath.add(sectionPath.isEmpty() ? getSectionName() : annotationName);
             processToDcat(subToConvert, subJsonFile, Optional.ofNullable(newKey), preData, preDist);
+            sectionPath.removeLast();
         }
     }
 
@@ -309,9 +317,15 @@ public class Converter {
     }
 
     protected void addError(ErrorType errorType, String key, Optional<String> subCat, String value) {
-        String section = buildSection(subCat);
-        ValidationError error = new ValidationError(errorType, sourceFilename, key, value, section);
+        ValidationError error = new ValidationError(errorType, sourceFilename, key, value, buildSection());
         errors.add(error);
+    }
+
+    protected Optional<String> toUri(String value) {
+        if (value.isBlank() || value.equals("null")) {
+            return Optional.empty();
+        }
+        return Optional.of(value.contains("http") ? value : "http://" + value);
     }
 
     /*
@@ -322,12 +336,10 @@ public class Converter {
         return "";
     }
 
-    private String buildSection(Optional<String> subCat) {
-        String sectionName = getSectionName();
-
-        if (subCat.isEmpty() || subCat.get().equals(sectionName)) {
-            return sectionName;
+    private String buildSection() {
+        if (sectionPath.isEmpty()) {
+            return getSectionName();
         }
-        return sectionName + "." + subCat.get();
+        return String.join(".", sectionPath);
     }
 }

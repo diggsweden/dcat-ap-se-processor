@@ -59,6 +59,8 @@ public class ConverterDataSet extends Converter {
                 converterDistribution.orgConvert = orgConvert;
                 converterDistribution.jsonObjectMandatoryDcat = jsonObjectMandatoryDcat;
                 converterDistribution.fileHandler = fileHandler;
+                converterDistribution.sectionPath.clear();
+                converterDistribution.sectionPath.addAll(this.sectionPath);
                 converterDistribution.createSubset(file, key, annotationName, Optional.of(dataSet), Optional.of(distribution), isMandatory);
                 
                 this.errors.addAll(converterDistribution.errors);
