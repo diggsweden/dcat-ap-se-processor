@@ -6,28 +6,21 @@
 # metadata file that makes public software easily discoverable.
 # More info at https://github.com/publiccodeyml/publiccode.yml
 
-publiccodeYmlVersion: '0.7'
-
+publiccodeYmlVersion: '0.8'
 name: 'DCAT-AP-SE Processor'
 url: 'https://github.com/diggsweden/dcat-ap-se-processor'
-
-softwareVersion: '0.9'
-releaseDate: '2022-10-01'
-
+softwareVersion: '1.0'
+releaseDate: '2026-11-18'
 platforms:
   - windows
   - web
   - linux
-
 categories:
   - application-development
   - it-development
   - compliance-management
-
-developmentStatus: beta
-
+developmentStatus: stable
 softwareType: 'standalone/web'
-
 description:
   en:
     shortDescription: Converts and validates API descriptions into DCAT-AP-SE metadata as RDF
@@ -56,13 +49,11 @@ description:
 
 legal:
   license: EUPL-1.2
-
 maintenance:
   type: internal
   contacts:
     - name: '@diggsweden/bb-api'
       affiliation: 'Digg - Agency for Digital Government'
-
 localisation:
   localisationReady: false
   availableLanguages:

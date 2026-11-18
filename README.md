@@ -334,8 +334,6 @@ Mjukvaran utvecklas av [DIGG](https://github.com/diggsweden) och Arbetsförmedli
 
 ## Versioner
 
-Aktuell version är 0.9.
-
-Detta är en första version av verktyget. Arbetsförmedlingen och Bolagsverket kommer prova mjukvaran skarpt under hösten 2022. När mjukvaran fungerar för tillräckligt många offentliga organisationer kommer versionen uppdateras till 1.0.
+Aktuell version är 1.0.
 
 ## Bidra
