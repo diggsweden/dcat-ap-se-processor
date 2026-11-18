@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>se.af</groupId>
 	<artifactId>dcat-ap-se-processor</artifactId>
-	<version>0.0.3-SNAPSHOT</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<name>dcat-ap-se-processor</name>
 	<description>Preprocessor - DCAT-AP-SE metadata</description>
 	<properties>
