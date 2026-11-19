@@ -1,9 +1,9 @@
 openapi: 3.1.0
 info:
   title: DCAT-AP-SE Processor API
-  version: 0.1.0
-  x-api-released: '2022-10-01'
-  x-api-status: beta
+  version: 1.0.0
+  x-api-released: '2026-11-18'
+  x-api-status: active
   summary: Converts API specifications into DCAT-AP-SE RDF/XML.
   description: |
     A tool for automating the production of metadata according to the
