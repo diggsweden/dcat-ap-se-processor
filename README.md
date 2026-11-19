@@ -63,7 +63,7 @@ docker build --no-cache -t "dcatprocessor" .
 ```
 
 ```text
-docker run -it --rm -p 8080:8080 dcatprocessor:latest 
+docker run -it --rm -p 8080:8080 dcatprocessor:latest
 ```
 
 ### Podman
@@ -75,22 +75,16 @@ podman build --no-cache -t "dcatprocessor" .
 ```
 
 ```text
-podman run -it --rm -p 8080:8080 dcatprocessor:latest 
+podman run -it --rm -p 8080:8080 dcatprocessor:latest
 ```
 
 ### Färdigbyggd image
 
-Alternativt, finns det också en experimentell färdigbyggd image för att testa.
+Varje release har en färdigbyggd image publicerad.
 
 ```text
-docker run ghcr.io/diggsweden/dcat-ap-se-processor:latest
+podman run --rm -p 8080:8080 ghcr.io/diggsweden/dcat-ap-se-processor:1.0.0
 ```
-
-```text
-podman run ghcr.io/diggsweden/dcat-ap-se-processor:latest
-```
-
-**ANVÄND INTE OVAN IMAGE I PRODUKTIONSYFTEN** - Den är endast avsedd för lokal test, och inga garantier lämnas på säkerhetsuppdateringar med mera.
 
 ## Användning
 
@@ -114,7 +108,7 @@ I gränssnittet finns en editor där det går att lägga till och redigera en/fl
 innan de skickas in för generering. Det finns också en startmalls funktion — ett
 formulär som hjälper till att skapa upp x-dcat-attribut i en API-definition.
 
-När generering lyckas levereras resultatet som en RDF på sidan och en kvalitets rapport blir tillgänglig under fliken rapport. Om något går fel visas en felrapport.
+När generering lyckas levereras resultatet som en RDF på sidan och en kvalitetsrapport blir tillgänglig under fliken rapport. Om något går fel visas en felrapport.
 
 ### 2. Via anrop till REST gränssnitt
 
@@ -124,7 +118,7 @@ Anropa endpoints med valfritt verktyg. I utveckling har vi använt curl från gi
 curl "http://localhost:8080/dcat-generation/files/?dir=<path-to-your-folder>"
 ```
 
-Vid lyckat anrop kommer en XML med genererad RFD att returneras.
+Vid lyckat anrop kommer en XML med genererad RDF att returneras.
 
 Jenkins pipeline exempel
 [Jenkinsfile](docs/jenkinsfile).
@@ -138,9 +132,9 @@ När argument skickas med körs den i CLI-läge och ingen webbserver startas.
 
 | Flagga | Värde | Beskrivning | Exempel |
 |--------|-------|-------------|---------|
-| `-f` | FIL | Konverterar en specifikationsfil (.raml, .yaml, .json) | `java -jar dcat-ap-se-processor-0.0.3-SNAPSHOT.jar -f api.yaml` |
-| `-d` | KATALOG | Konverterar alla specifikationsfiler i en katalog | `java -jar dcat-ap-se-processor-0.0.3-SNAPSHOT.jar -d ./specs` |
-| `-h` | - | Visa hjälpmenyn | `java -jar dcat-ap-se-processor-0.0.3-SNAPSHOT.jar -h` |
+| `-f` | FIL | Konverterar en specifikationsfil (.raml, .yaml, .json) | `java -jar dcat-ap-se-processor-1.0.0.jar -f api.yaml` |
+| `-d` | KATALOG | Konverterar alla specifikationsfiler i en katalog | `java -jar dcat-ap-se-processor-1.0.0.jar -d ./specs` |
+| `-h` | - | Visa hjälpmenyn | `java -jar dcat-ap-se-processor-1.0.0.jar -h` |
 
 Endast en CLI-flagga kan användas per körning. Flaggorna `-f` och `-d` kräver ett värde i form av en fil- eller katalogsökväg, medan `-h` och `-help` används utan värde.
 
@@ -155,27 +149,27 @@ Bygg en java JAR fil.
 mvn clean package -DskipTests
 ```
 
-Konvertera en specifikationsfil, resultatet blir en RDF samt en kvalitets rapport, båda ges som fil och visas via stdout:
+Konvertera en specifikationsfil, resultatet blir en RDF samt en kvalitetsrapport, båda ges som fil och visas via stdout:
 
 ```text
-java -jar dcat-ap-se-processor-0.0.3-SNAPSHOT.jar -f FIL
+java -jar dcat-ap-se-processor-1.0.0.jar -f FIL
 ```
 
-Konvertera en katalog med specifikationsfiler, resultatet blir en RDF samt en kvalitets rapport, båda ges som fil och visas via stdout:
+Konvertera en katalog med specifikationsfiler, resultatet blir en RDF samt en kvalitetsrapport, båda ges som fil och visas via stdout:
 
 ```text
-java -jar dcat-ap-se-processor-0.0.3-SNAPSHOT.jar -d KATALOG
+java -jar dcat-ap-se-processor-1.0.0.jar -d KATALOG
 ```
 
 Visa hjälpmenyn med information om tillgängliga flaggor och exempel på användning:
 
 ```text
-java -jar dcat-ap-se-processor-0.0.3-SNAPSHOT.jar -h
+java -jar dcat-ap-se-processor-1.0.0.jar -h
 ```
 
 Hjälpmenyn kan även visas med -help. Båda alternativen avslutar programmet med exitkod 0.
 
-Vid lyckad konvertering skrivs DCAT-datan till stdout och till filen `dcat.rdf` i aktuell katalog.
+Vid lyckad konvertering skrivs DCAT-datan till stdout och filerna `dcat.rdf` och `dcat-quality-report.json` skapas i aktuell katalog.
 Om konverteringen misslyckas skrivs en felrapport till stderr och ingen fil skapas.
 
 #### Exitkoder
