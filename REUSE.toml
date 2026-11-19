@@ -21,6 +21,7 @@ path = [
   "README.md",
   "SECURITY.md",
   "DEVELOPMENT.md",
+  "CHANGELOG.md",
   "docs/*.md",
   "docs/**/.png",
   "docs/jenkinsfile",
