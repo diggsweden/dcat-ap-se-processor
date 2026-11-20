@@ -22,6 +22,8 @@ jobs:
       id-token: write
       pull-requests: read
     uses: diggsweden/reusable-ci/.github/workflows/security-openssf-scorecard.yml@1a76b0c1a69952742ea663c8cfe77d8fe1d168ad # v3.1.0
+    secrets:
+      CODE_SCANNING_TOKEN: ${{ secrets.SARIF_UPLOAD_TOKEN }}
     with:
       reusable-ci-ref: 1a76b0c1a69952742ea663c8cfe77d8fe1d168ad # v3.1.0
       publish-results: true
