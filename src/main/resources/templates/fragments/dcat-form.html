@@ -51,10 +51,12 @@
       </a>
     </div>
     <label class="required" for="pub-about">URI för utgivaren</label>
-    <input type="url" id="pub-about" name="publisher.about" required placeholder="https://exempel.myndighet.se" />
+    <input type="url" id="pub-about" name="publisher.about" required placeholder="https://dataportal.se/organisation/SE<organisationsnummer>" />
     <small class="text-muted">
-      Använd samma URI varje gång för er organisation, t.ex. er egen domän. Om URI:n skiljer sig mellan inskick tolkas
-      det som olika utgivare på dataportalen.
+      Utgivare ska anges i formatet: https://dataportal.se/organisation/SE&lt;organisationsnummer&gt;.<br/>
+      Registrerade organisationer finns under
+      <a href="https://www.dataportal.se/organisations" target="_blank" rel="noopener">Sök organisationer</a> på Dataportalen.
+      Det är viktigt att samma identifierare alltid används för att metadata ska kopplas till rätt organisation.
     </small>
     <label class="required" for="pub-name">Namn</label>
     <input type="text" id="pub-name" name="publisher.name" required placeholder="Namn på organisation" />
@@ -94,7 +96,7 @@
       placeholder="Beskrivning av datamängd"
     ></textarea>
     <label for="ds-keywords">Nyckelord (kommaseparerade)</label>
-    <input type="text" id="ds-keywords" name="dataset.keywords" placeholder="öppna data, statistik, api" />
+    <input type="text" id="ds-keywords" name="dataset.keywords" placeholder="Nyckelord" />
     <label for="ds-theme">Kategori (EU data theme)</label>
     <select id="ds-theme" name="dataset.theme">
       <option value="">Välj kategori</option>
@@ -106,6 +108,26 @@
       <option value="TECH">Vetenskap och teknik</option>
       <option value="TRAN">Transport</option>
     </select>
+    <div class="d-flex">
+      <label for="ds-conformsto-about">Standard som datamängden följer (URI)</label>
+      <a class="ml-2" target="_blank" rel="noopener" href="https://docs.dataportal.se/dcat/sv/#dcat_Dataset-dcterms_conformsTo"
+        >läs mer
+        <i class="fa-solid fa-up-right-from-square"></i>
+      </a>
+    </div>
+    <input
+      type="url"
+      id="ds-conformsto-about"
+      name="dataset.conformsTo.about"
+      placeholder="https://www.dataportal.se/specifications/lekplatser/1.0"
+    />
+    <small class="text-muted">
+      Här anger du om datamängden följer en känd specifikation, till exempel en informationsmodell eller ett
+      dataformat som flera aktörer använder. Ange en stabil URL till specifikationen, till exempel en specifikation som är publicerad på
+      <a href="https://www.dataportal.se/specifications" target="_blank" rel="noopener">Dataportalen</a>.
+    </small>
+    <label for="ds-conformsto-title">Standardens titel</label>
+    <input type="text" id="ds-conformsto-title" name="dataset.conformsTo.title" placeholder="Namn på standard som uppfylls" />
 
     <div class="d-flex">
       <h3>Kontaktuppgift</h3>

@@ -21,6 +21,11 @@
         "keyword-sv": "dataset.keywords",
         "keyword-en": "dataset.keywords",
         "theme": "dataset.theme",
+        "conformsTo": {
+            "about": "dataset.conformsTo.about",
+            "title-sv": "dataset.conformsTo.title",
+            "title-en": "dataset.conformsTo.title"
+        },
         "contactPoint": {
             "about": "contactPoint.about",
             "type": "contactPoint.type",
